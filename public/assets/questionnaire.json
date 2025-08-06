@@ -1,0 +1,104 @@
+[
+  {
+    "question": "What is the name of the AI chatbot on the Fintrex website?",
+    "options": ["Fintra", "Finty", "Fino", "Frexie"],
+    "answer": "Fintra"
+  },
+  {
+    "question": "What is the general contact number for Fintrex Finance?",
+    "options": ["0117 977 977", "0117 200 100", "0112 345 678", "0777 777 777"],
+    "answer": "0117 977 977"
+  },
+  {
+    "question": "What is the Fintrex customer hotline?",
+    "options": ["0117 977 977", "0117 200 100", "0112 000 000", "1999"],
+    "answer": "0117 200 100"
+  },
+  {
+    "question": "What type of loan does Fintrex offer where your gold is used as security?",
+    "options": ["Personal Loan", "Gold Loan", "Lease", "Business Loan"],
+    "answer": "Gold Loan"
+  },
+  {
+    "question": "What is the name of the savings account designed for senior citizens?",
+    "options": ["Vishista", "Pravishta", "Vidyartha", "Savvy Senior"],
+    "answer": "Vishista"
+  },
+  {
+    "question": "Fintrex Finance was formerly known as:",
+    "options": ["Melsta Regal Finance Ltd", "Golden Regal Finance", "Capital Trust Finance", "Lanka Micro Finance"],
+    "answer": "Melsta Regal Finance Ltd"
+  },
+  {
+    "question": "What is the name of the children's savings account offered by Fintrex?",
+    "options": ["Pravishta", "KidSave", "Little Saver", "Junior Gems"],
+    "answer": "Pravishta"
+  },
+  {
+    "question": "Which of these services is available via the Fintrex website?",
+    "options": ["Online Loan Settlement", "Crypto Wallet Creation", "Pet Insurance", "Car Servicing"],
+    "answer": "Online Loan Settlement"
+  },
+  {
+    "question": "Which type of deposit offers higher interest for senior citizens?",
+    "options": ["Fixed Deposit", "Savings Account", "Gold Loan", "Business Account"],
+    "answer": "Fixed Deposit"
+  },
+  {
+    "question": "What is a benefit of Fintrex Savings Accounts?",
+    "options": ["Daily interest calculation", "No ATM withdrawals", "High fees", "Interest only after 5 years"],
+    "answer": "Daily interest calculation"
+  },
+
+  
+  {
+    "question": "What is the minimum age to open a Fintrex savings account?",
+    "options": ["18 years", "16 years", "21 years", "15 years"],
+    "answer": "16 years"
+  },
+  {
+    "question": "Which Fintrex service helps you repay your loan online?",
+    "options": ["Online Loan Settlement", "Auto Loan Renewal", "Mobile Deposit", "Cash Advance"],
+    "answer": "Online Loan Settlement"
+  },
+  {
+    "question": "What does Fintrex's ‘Lease’ service typically apply to?",
+    "options": ["Vehicles", "Home Appliances", "Real Estate", "Electronics"],
+    "answer": "Vehicles"
+  },
+  {
+    "question": "Fintrex Finance is regulated by which authority?",
+    "options": ["Central Bank of Sri Lanka", "Ministry of Finance", "Financial Services Authority", "Sri Lanka Stock Exchange"],
+    "answer": "Central Bank of Sri Lanka"
+  },
+  {
+    "question": "Which account type at Fintrex offers higher interest rates with fixed tenure?",
+    "options": ["Fixed Deposit", "Savings Account", "Current Account", "Recurring Deposit"],
+    "answer": "Fixed Deposit"
+  },
+  {
+    "question": "How often is interest calculated on Fintrex savings accounts?",
+    "options": ["Daily", "Monthly", "Quarterly", "Annually"],
+    "answer": "Daily"
+  },
+  {
+    "question": "Which of these is NOT a Fintrex loan product?",
+    "options": ["Personal Loan", "Gold Loan", "Crypto Loan", "Lease"],
+    "answer": "Crypto Loan"
+  },
+  {
+    "question": "What is Fintrex's core value related to customer service?",
+    "options": ["Transparency", "Speed", "Privacy", "Automation"],
+    "answer": "Transparency"
+  },
+  {
+    "question": "Which mobile banking feature is offered by Fintrex?",
+    "options": ["Balance Inquiry", "Cryptocurrency Trading", "Car Leasing", "Stock Market Investment"],
+    "answer": "Balance Inquiry"
+  },
+  {
+    "question": "What does Fintrex primarily use as collateral for gold loans?",
+    "options": ["Gold Jewelry", "Real Estate", "Vehicles", "Stocks"],
+    "answer": "Gold Jewelry"
+  }
+]

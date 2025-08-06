@@ -1,0 +1,15 @@
+@import url('https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Comic+Neue&display=swap');
+
+@import "tailwindcss";
+
+body {
+  font-family: 'Comic Neue', cursive;
+  background-color: #1a202c; /* Tailwind's gray-900 background */
+  color: white;
+}
+
+/* Heading styles can use Luckiest Guy */
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Luckiest Guy', cursive;
+}
