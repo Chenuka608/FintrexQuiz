@@ -1,0 +1,170 @@
+[
+  {
+    "question": "What is the name of the AI chatbot on the Fintrex website?",
+    "options": ["Fintra", "Finty", "Fino", "Frexie"],
+    "answer": "Fintra"
+  },
+  {
+    "question": "What is the general contact number for Fintrex Finance?",
+    "options": ["0117 977 977", "0117 200 100", "0112 345 678", "0777 777 777"],
+    "answer": "0117 977 977"
+  },
+  {
+    "question": "What is the Fintrex customer hotline?",
+    "options": ["0117 977 977", "0117 200 100", "0112 000 000", "1999"],
+    "answer": "0117 200 100"
+  },
+  
+  {
+    "question": "Fintrex Finance was formerly known as:",
+    "options": ["Melsta Regal Finance Ltd", "Golden Regal Finance", "Capital Trust Finance", "Lanka Micro Finance"],
+    "answer": "Melsta Regal Finance Ltd"
+  },
+  {
+    "question": "What is the name of the children's savings account offered by Fintrex?",
+    "options": ["Pravishta", "KidSave", "Little Saver", "Junior Gems"],
+    "answer": "Pravishta"
+  },
+  {
+    "question": "Which of these services is available via the Fintrex website?",
+    "options": ["Online Loan Settlement", "Crypto Wallet Creation", "Pet Insurance", "Car Servicing"],
+    "answer": "Online Loan Settlement"
+  },
+  {
+    "question": "Which type of deposit offers higher interest for senior citizens?",
+    "options": ["Fixed Deposit", "Savings Account", "Gold Loan", "Business Account"],
+    "answer": "Fixed Deposit"
+  },
+  
+  {
+    "question": "What is the minimum age to open a Fintrex savings account?",
+    "options": ["18 years", "16 years", "21 years", "15 years"],
+    "answer": "16 years"
+  },
+  
+  
+  {
+    "question": "Fintrex Finance is regulated by which authority?",
+    "options": ["Central Bank of Sri Lanka", "Ministry of Finance", "Financial Services Authority", "Sri Lanka Stock Exchange"],
+    "answer": "Central Bank of Sri Lanka"
+  },
+  {
+    "question": "Which account type at Fintrex offers higher interest rates with fixed tenure?",
+    "options": ["Fixed Deposit", "Savings Account", "Current Account", "Recurring Deposit"],
+    "answer": "Fixed Deposit"
+  },
+  {
+    "question": "How often is interest calculated on Fintrex savings accounts?",
+    "options": ["Daily", "Monthly", "Quarterly", "Annually"],
+    "answer": "Daily"
+  },
+  {
+    "question": "Which of these is NOT a Fintrex loan product?",
+    "options": ["Personal Loan", "Gold Loan", "Crypto Loan", "Lease"],
+    "answer": "Crypto Loan"
+  },
+  
+  {
+    "question": "What is the primary collateral required for Fintrex's 'Ran Shakthi' Gold Loan?",
+    "options": ["Gold Jewelry", "Gold Bullion", "Gold Coins", "Gold Watches"],
+    "answer": "Gold Jewelry"
+  },
+  {
+    "question": "Which savings account at Fintrex is tailored for senior citizens, offering higher interest rates?",
+    "options": ["Vishista", "Shreyshta", "Pravishta", "Flexy Fix"],
+    "answer": "Shreyshta"
+  },
+  {
+    "question": "Fintrex's 'Flexy Fix' Money Market Savings Account is ideal for which group?",
+    "options": ["Students", "Senior Citizens", "Corporate Clients and SMEs", "Retired Individuals"],
+    "answer": "Corporate Clients and SMEs"
+  },
+  {
+    "question": "What is the minimum initial deposit required to open a 'Vishista' Savings Account at Fintrex?",
+    "options": ["Rs. 500", "Rs. 1,000", "Rs. 2,000", "Rs. 5,000"],
+    "answer": "Rs. 1,000"
+  },
+  {
+    "question": "Which Fintrex service allows you to purchase mobile devices on easy installment plans?",
+    "options": ["Easy Leasing", "Mobile Loan", "Gold Loan", "Fixed Deposit"],
+    "answer": "Mobile Loan"
+  },
+  {
+    "question": "What is the maximum loan limit for Fintrex's business loans?",
+    "options": ["Rs. 50 Million", "Rs. 100 Million", "Rs. 150 Million", "Rs. 200 Million"],
+    "answer": "Rs. 150 Million"
+  },
+  {
+    "question": "Which Fintrex product offers guaranteed interest rates with flexible investment plans ranging from 1 to 5 years?",
+    "options": ["Fixed Deposit", "Dream Plan", "Gold Loan", "Mobile Loan"],
+    "answer": "Dream Plan"
+  },
+  {
+    "question": "Fintrex's 'Easy Leasing' service provides financing for which type of vehicles?",
+    "options": ["Four Wheeler", "Two Wheeler", "Three Wheeler", "All of the Above"],
+    "answer": "All of the Above"
+  },
+  {
+    "question": "Which of the following is NOT a feature of Fintrex's Fixed Deposit accounts?",
+    "options": ["Monthly interest payouts", "Flexible tenure from 1 to 60 months", "Senior citizen discounts", "Daily interest calculation"],
+    "answer": "Daily interest calculation"
+  },
+  {
+    "question": "What is the minimum age requirement to open a 'Pravishta' Children's Savings Account at Fintrex?",
+    "options": ["10 years", "12 years", "15 years", "18 years"],
+    "answer": "10 years"
+  },
+  {
+    "question": "Which of these is NOT a collateral accepted by Fintrex for loan security?",
+    "options": ["Gold Jewelry", "Real Estate", "Vehicles", "Cryptocurrency"],
+    "answer": "Cryptocurrency"
+  },
+  {
+    "question": "What is the primary benefit of Fintrex's 'Over Drive' facility?",
+    "options": ["Fixed monthly payments", "Revolving credit line", "Long-term investment", "Asset-backed loan"],
+    "answer": "Revolving credit line"
+  },
+  {
+    "question": "Which Fintrex service allows you to repay your loan online?",
+    "options": ["Online Loan Settlement", "Auto Loan Renewal", "Mobile Deposit", "Cash Advance"],
+    "answer": "Online Loan Settlement"
+  },
+  {
+    "question": "What is the primary purpose of Fintrex's 'Dream Plan'?",
+    "options": ["Short-term savings", "Emergency fund", "Long-term financial goals", "Daily expenses"],
+    "answer": "Long-term financial goals"
+  },
+  {
+    "question": "Which of these is a feature of Fintrex's 'Easy Leasing' service?",
+    "options": ["No credit card required", "Swift approval within one hour", "High-interest rates", "Long repayment terms only"],
+    "answer": "Swift approval within one hour"
+  },
+  {
+    "question": "What is the maximum tenure available for Fintrex's Fixed Deposit accounts?",
+    "options": ["12 months", "24 months", "36 months", "60 months"],
+    "answer": "60 months"
+  },
+  {
+    "question": "Which of these is NOT a feature of Fintrex's 'Mobile Loan' service?",
+    "options": ["Quick approval", "No credit card required", "High-interest rates", "Affordable monthly installments"],
+    "answer": "High-interest rates"
+  },
+  {
+    "question": "Which of the following is a benefit of Fintrex's 'Gold Loan' service?",
+    "options": ["No collateral required", "High loan amounts against gold jewelry", "Fixed interest rates only", "Limited repayment options"],
+    "answer": "High loan amounts against gold jewelry"
+  },
+  {
+    "question": "What is the primary feature of Fintrex's 'Shreyshta' savings account?",
+    "options": ["Higher interest rates for senior citizens", "Daily interest calculation", "Monthly interest payouts", "No minimum deposit requirement"],
+    "answer": "Higher interest rates for senior citizens"
+  },
+  {
+    "question": "Which of these is a feature of Fintrex's 'Dream Plan'?",
+    "options": ["Guaranteed interest rate", "Short-term investment horizon", "No premature withdrawal option", "Fixed monthly contributions only"],
+    "answer": "Guaranteed interest rate"
+  }
+]
+
+  
+
