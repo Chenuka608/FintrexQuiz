@@ -14,7 +14,21 @@
     "options": ["0117 977 977", "0117 200 100", "0112 000 000", "1999"],
     "answer": "0117 200 100"
   },
-  
+  {
+    "question": "What is the chatbot/WhatsApp number for Fintrex Finance?",
+    "options": ["+94 77 520 0100", "+94 11 200 100", "+94 11 977 977", "+94 77 777 7777"],
+    "answer": "+94 77 520 0100"
+  },
+  {
+    "question": "How many branches does Fintrex Finance have?",
+    "options": ["10", "15", "17", "20"],
+    "answer": "17"
+  },
+  {
+    "question": "What is the company rating of Fintrex Finance?",
+    "options": ["AAA", "BB(lka)", "B+", "A(lka)"],
+    "answer": "BB(lka)"
+  },
   {
     "question": "Fintrex Finance was formerly known as:",
     "options": ["Melsta Regal Finance Ltd", "Golden Regal Finance", "Capital Trust Finance", "Lanka Micro Finance"],
@@ -35,14 +49,11 @@
     "options": ["Fixed Deposit", "Savings Account", "Gold Loan", "Business Account"],
     "answer": "Fixed Deposit"
   },
-  
   {
     "question": "What is the minimum age to open a Fintrex savings account?",
     "options": ["18 years", "16 years", "21 years", "15 years"],
     "answer": "16 years"
   },
-  
-  
   {
     "question": "Fintrex Finance is regulated by which authority?",
     "options": ["Central Bank of Sri Lanka", "Ministry of Finance", "Financial Services Authority", "Sri Lanka Stock Exchange"],
@@ -63,7 +74,6 @@
     "options": ["Personal Loan", "Gold Loan", "Crypto Loan", "Lease"],
     "answer": "Crypto Loan"
   },
-  
   {
     "question": "What is the primary collateral required for Fintrex's 'Ran Shakthi' Gold Loan?",
     "options": ["Gold Jewelry", "Gold Bullion", "Gold Coins", "Gold Watches"],
@@ -165,6 +175,3 @@
     "answer": "Guaranteed interest rate"
   }
 ]
-
-  
-

@@ -1,6 +1,6 @@
-import React, { useEffect, useState, useRef } from 'react';
-import Swal from 'sweetalert2';
-import withReactContent from 'sweetalert2-react-content';
+import React, { useEffect, useState, useRef } from "react";
+import Swal from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
 
 const shuffleArray = (arr) => {
   const array = [...arr];
@@ -11,7 +11,7 @@ const shuffleArray = (arr) => {
   return array;
 };
 
-const STORAGE_KEY = 'fintrex_quiz_state';
+const STORAGE_KEY = "fintrex_quiz_state";
 const QUIZ_DURATION_SECONDS = 360;
 
 const Questionnaire = () => {
@@ -33,6 +33,7 @@ const Questionnaire = () => {
   const [selectedOption, setSelectedOption] = useState(null);
   const [answersGiven, setAnswersGiven] = useState([]);
 
+  // Restore state if it exists
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
@@ -52,6 +53,7 @@ const Questionnaire = () => {
     }
   }, []);
 
+  // Save state to storage
   useEffect(() => {
     if (!loading) {
       const stateToSave = {
@@ -67,12 +69,24 @@ const Questionnaire = () => {
       };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(stateToSave));
     }
-  }, [questions, currentIndex, score, showStart, timeUpHandled, quizEnded, quizStartTimestamp, answersGiven, selectedOption, loading]);
+  }, [
+    questions,
+    currentIndex,
+    score,
+    showStart,
+    timeUpHandled,
+    quizEnded,
+    quizStartTimestamp,
+    answersGiven,
+    selectedOption,
+    loading,
+  ]);
 
+  // Load questions
   useEffect(() => {
-    fetch('/assets/questionnaire.json')
-      .then(res => res.json())
-      .then(data => {
+    fetch("/assets/questionnaire.json")
+      .then((res) => res.json())
+      .then((data) => {
         setAllQuestions(data);
         setLoading(false);
         if (!restoredFromStorage.current) {
@@ -81,13 +95,14 @@ const Questionnaire = () => {
       })
       .catch(() => {
         MySwal.fire({
-          icon: 'error',
-          title: 'Uh-oh!',
-          text: "Couldn't load Finny's questions. Try again later.",
+          icon: "error",
+          title: "Uh-oh!",
+          text: "Couldn't load questions. Try again later.",
         });
       });
   }, []);
 
+  // Timer
   useEffect(() => {
     if (showStart || quizEnded) return;
 
@@ -109,10 +124,10 @@ const Questionnaire = () => {
           setTimeUpHandled(true);
           timerRef.current && clearInterval(timerRef.current);
           MySwal.fire({
-            icon: 'warning',
+            icon: "warning",
             title: "Time's up!",
-            text: 'Your time has run out. Check your results.',
-            confirmButtonText: 'See Score',
+            text: "Your time has run out. Check your results.",
+            confirmButtonText: "See Score",
           }).then(() => setQuizEnded(true));
         }
       } else {
@@ -132,43 +147,32 @@ const Questionnaire = () => {
     }
   }, [quizEnded]);
 
+  // Submit answer
   const submitAnswer = () => {
     if (quizEnded || timeLeft <= 0 || selectedOption === null) return;
 
     const currentQ = questions[currentIndex];
     const isCorrect = selectedOption === currentQ.answer;
 
-    setAnswersGiven(prev => [...prev, {
-      question: currentQ.question,
-      selected: selectedOption,
-      correct: currentQ.answer,
-    }]);
+    setAnswersGiven((prev) => [
+      ...prev,
+      { question: currentQ.question, selected: selectedOption, correct: currentQ.answer },
+    ]);
 
-    if (isCorrect) setScore(s => s + 1);
+    if (isCorrect) setScore((s) => s + 1);
 
-    const folder = isCorrect ? 'successImgs' : 'failImgs';
     const imgs = isCorrect
-      ? ['bank.png', 'happy.png', 'money.png']
-      : ['crash.png', 'debt.png', 'debt2.png'];
-    const msgs = isCorrect
-      ? ["Finny's rich now!", "You're saving Finny's wallet!", "He’s finally got a budget!"]
-      : ["Finny's leased car just exploded 💥", "He's knee-deep in leasing debt 😭", "He maxed his credit card 😵"];
+      ? ["correct1.jpg", "correct2.jpg", "correct3.jpg"]
+      : ["wrong1.jpg", "wrong2.jpg", "wrong3.jpg"];
 
     const idx = Math.floor(Math.random() * imgs.length);
-    const imgUrl = `/assets/${folder}/${imgs[idx]}`;
+    const imgUrl = `/assets/${imgs[idx]}`;
 
     MySwal.fire({
-      title: isCorrect ? 'Correct!' : 'Oops!',
-      text: msgs[idx],
+      title: isCorrect ? "Correct!" : "Wrong!",
       imageUrl: imgUrl,
-      imageHeight: 220,
-      confirmButtonText: 'Continue',
-      customClass: {
-        popup: 'rounded-lg shadow-lg',
-        title: 'font-luckiest text-3xl',
-        content: 'font-comic text-lg',
-        confirmButton: 'bg-lime-400 hover:bg-lime-500 rounded px-6 py-2 text-white font-bold shadow-sm',
-      }
+      imageHeight: 300,
+      confirmButtonText: "Continue",
     }).then(() => {
       const nextIndex = currentIndex + 1;
       if (nextIndex >= questions.length) {
@@ -180,7 +184,6 @@ const Questionnaire = () => {
     });
   };
 
-  // This just resets to intro, NOT start the quiz immediately
   const resetToIntro = () => {
     setShowStart(true);
     setQuestions([]);
@@ -196,13 +199,12 @@ const Questionnaire = () => {
     restoredFromStorage.current = false;
   };
 
-  // This starts the quiz from the intro
   const startQuiz = () => {
     if (!allQuestions.length) return;
 
     const now = Date.now();
     const selected = shuffleArray(allQuestions).slice(0, 10);
-    const shuffledQuestions = selected.map(q => ({
+    const shuffledQuestions = selected.map((q) => ({
       question: q.question,
       options: shuffleArray(q.options),
       answer: q.answer,
@@ -223,12 +225,13 @@ const Questionnaire = () => {
     restoredFromStorage.current = false;
   };
 
-  const formatTime = s => {
+  const formatTime = (s) => {
     const m = Math.floor(s / 60);
     const sec = s % 60;
-    return `${m}:${sec < 10 ? '0' : ''}${sec}`;
+    return `${m}:${sec < 10 ? "0" : ""}${sec}`;
   };
 
+  // Loading screen
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-purple-800 text-white">
@@ -237,38 +240,35 @@ const Questionnaire = () => {
     );
   }
 
+  // End screen
   if (quizEnded) {
     const passed = score >= 6;
-    const finalImg = passed ? '/assets/successImgs/bank.png' : '/assets/failImgs/debt.png';
-    const finalTitle = passed ? 'Congratulations! Finny is a Finance Expert!' : 'Nice Try! Finny needs to learn more...';
-    const finalMsg = passed
-      ? `You scored ${score} / ${questions.length}. Finny’s wallet is happy! 🤑`
-      : `You scored ${score} / ${questions.length}. Keep guiding Finny to financial wisdom!`;
+    const finalImg = passed ? "/assets/won.jpg" : "/assets/lost.jpg";
+    const finalTitle = passed ? "Congratulations!" : "Better luck next time!";
+    const finalMsg = `You scored ${score} / ${questions.length}.`;
 
     return (
-      <div className="min-h-screen bg-purple-800 text-white p-6 px-4">
+      <div className="min-h-screen bg-purple-800 text-white p-6">
         <div className="flex flex-col items-center mb-8 text-center">
-          <img
-            src={finalImg}
-            alt={passed ? 'Finny Rich' : 'Finny Learning'}
-            className="w-72 max-w-full mb-4 rounded-lg shadow-xl"
-            style={{ filter: passed ? 'drop-shadow(0 0 15px gold)' : 'drop-shadow(0 0 15px red)' }}
-          />
-          <h2 className="text-3xl font-luckiest mb-2">{finalTitle}</h2>
-          <p className="text-2xl font-comic mb-10">{finalMsg}</p>
+          <img src={finalImg} alt="Result" className="w-80 max-w-full mb-4 rounded-lg shadow-xl" />
+          <h2 className="text-3xl mb-2">{finalTitle}</h2>
+          <p className="text-2xl mb-10">{finalMsg}</p>
         </div>
 
-        <h2 className="text-3xl font-luckiest mb-4 text-center">Review Your Answers</h2>
-        <div className="max-w-3xl mx-auto space-y-6">
+        <h2 className="text-2xl mb-4 text-center">Review Your Answers</h2>
+        <div className="max-w-3xl mx-auto space-y-4">
           {answersGiven.map(({ question, selected, correct }, i) => {
             const isCorrect = selected === correct;
             return (
-              <div key={i} className={`p-4 rounded-lg shadow-md ${isCorrect ? 'bg-green-700' : 'bg-red-700'}`}>
-                <h2 className=" text-lg mb-1">{`Q${i + 1}: ${question}`}</h2>
+              <div
+                key={i}
+                className={`p-4 rounded-lg shadow-md ${
+                  isCorrect ? "bg-green-700" : "bg-red-700"
+                }`}
+              >
+                <h2 className="text-lg mb-1">{`Q${i + 1}: ${question}`}</h2>
                 <p>Your answer: <span className="font-semibold">{selected}</span></p>
-                {!isCorrect && (
-                  <p>Correct answer: <span className="font-semibold">{correct}</span></p>
-                )}
+                {!isCorrect && <p>Correct answer: <span className="font-semibold">{correct}</span></p>}
               </div>
             );
           })}
@@ -276,8 +276,8 @@ const Questionnaire = () => {
 
         <div className="flex justify-center mt-10">
           <button
-            onClick={resetToIntro} // Now shows intro page instead of starting quiz immediately
-            className="bg-lime-400 hover:bg-lime-500 transition px-10 py-4 rounded-lg text-white text-2xl font-bold shadow-md"
+            onClick={resetToIntro}
+            className="bg-lime-400 hover:bg-lime-500 px-10 py-4 rounded-lg text-white text-2xl font-bold shadow-md"
           >
             Restart Quiz
           </button>
@@ -286,28 +286,42 @@ const Questionnaire = () => {
     );
   }
 
-  if (showStart) {
-    // INTRODUCTION PAGE - you can expand this with more story text if you want
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-purple-800 text-white text-center px-6">
-        <img src="/assets/learn.png" alt="Finny Confused" className="w-52 sm:w-60 mb-6" />
-        <h1 className="text-2xl sm:text-1xl font-luckiest mb-2">Help Finny Learn about Fintrex Finance!</h1>
-        <p className="text-lg sm:text-1xl font-comic mb-6 max-w-md px-2">
-          Finny is on a journey to become a finance expert! Sometimes he makes mistakes, but with your help, he'll learn about Fintrex Finance.
-        </p>
-        <p className="text-base sm:text-lg font-comic mb-8 max-w-md px-2">
-          Ready to start? Answer the questions wisely and help Finny grow rich!
-        </p>
-        <button
-          onClick={startQuiz}
-          className="bg-lime-400 hover:bg-lime-500 transition px-8 py-3 rounded text-white text-xl font-bold shadow-sm w-full max-w-xs sm:max-w-none sm:w-auto"
-        >
-          Start Quiz
-        </button>
-      </div>
-    );
-  }
+  // Menu (Start Screen)
+if (showStart) {
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen bg-purple-800 text-white text-center px-6">
+      {/* Logo */}
+      <img 
+        src="/assets/logo.png" 
+        alt="Fintrex Logo" 
+        className="w-32 sm:w-40 mb-6 drop-shadow-lg"
+      />
 
+      {/* Event Titles */}
+      <h1 className="text-4xl sm:text-5xl font-extrabold mb-2">Fintrex Finance</h1>
+      <h2 className="text-2xl sm:text-3xl font-semibold mb-8">
+        Customer Service Week
+      </h2>
+
+      {/* Intro Image */}
+      <img 
+        src="/assets/menu.jpg" 
+        alt="Intro" 
+        className="w-100 sm:w-100 mb-10 rounded-lg shadow-lg"
+      />
+
+      {/* Start Button */}
+      <button
+        onClick={startQuiz}
+        className="bg-lime-400 hover:bg-lime-500 px-10 py-4 rounded text-white text-2xl font-bold shadow-sm transition"
+      >
+        Start Quiz
+      </button>
+    </div>
+  );
+}
+
+  // Quiz screen
   const currentQ = questions[currentIndex];
 
   return (
@@ -315,45 +329,43 @@ const Questionnaire = () => {
       <button
         onClick={() => {
           MySwal.fire({
-            title: 'Start a new game?',
-            text: 'Your current progress will be lost. Are you sure?',
-            icon: 'warning',
+            title: "Start a new game?",
+            text: "Your current progress will be lost. Are you sure?",
+            icon: "warning",
             showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Yes, start over',
-            cancelButtonText: 'Cancel',
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Yes, start over",
+            cancelButtonText: "Cancel",
           }).then((result) => {
             if (result.isConfirmed) {
-              resetToIntro(); // Changed to show intro on New Game too
+              resetToIntro();
             }
           });
         }}
         className="absolute top-4 right-4 bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-white font-semibold shadow-md"
-        type="button"
       >
         New Game
       </button>
 
       <div className="w-full max-w-xl">
-        <div className="flex flex-col sm:flex-row justify-between items-center mb-5 text-base sm:text-lg font-semibold font-comic gap-2 sm:gap-0">
+        <div className="flex flex-col sm:flex-row justify-between items-center mb-5 text-lg font-semibold">
           <span>Question {currentIndex + 1} / {questions.length}</span>
           <span>Time Left: {formatTime(timeLeft)}</span>
         </div>
 
-        <div className="bg-purple-700 p-6 sm:p-8 rounded-xl shadow-md">
-          <h2 className="text-xl sm:text-2xl font-luckiest mb-6">{currentQ.question}</h2>
-          <div className="grid gap-3 sm:gap-4 mb-6">
+        <div className="bg-purple-700 p-6 rounded-xl shadow-md">
+          <h2 className="text-xl sm:text-2xl mb-6">{currentQ.question}</h2>
+          <div className="grid gap-3 mb-6">
             {currentQ.options.map((opt, i) => {
               const isSelected = selectedOption === opt;
               return (
                 <button
                   key={i}
                   onClick={() => !quizEnded && setSelectedOption(opt)}
-                  className={`p-4 rounded-lg text-left text-white text-base sm:text-lg font-comic w-full shadow-sm transition
-                    ${isSelected ? 'bg-lime-500 hover:bg-lime-600' : 'bg-lime-700 hover:bg-lime-500'}
+                  className={`p-4 rounded-lg text-left w-full shadow-sm transition
+                    ${isSelected ? "bg-lime-500" : "bg-lime-700 hover:bg-lime-500"}
                   `}
-                  type="button"
                 >
                   {opt}
                 </button>
@@ -363,10 +375,9 @@ const Questionnaire = () => {
           <button
             onClick={submitAnswer}
             disabled={selectedOption === null}
-            className={`w-full py-3 rounded-lg font-bold text-white text-xl
-              ${selectedOption === null ? 'bg-gray-500 cursor-not-allowed' : 'bg-lime-400 hover:bg-lime-500'}
+            className={`w-full py-3 rounded-lg font-bold text-xl
+              ${selectedOption === null ? "bg-gray-500 cursor-not-allowed" : "bg-lime-400 hover:bg-lime-500"}
             `}
-            type="button"
           >
             Submit Answer
           </button>
