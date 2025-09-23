@@ -8,28 +8,29 @@ dotenv.config();
 
 const app = express();
 
-// ✅ Fix CORS: allow Vite dev server (5173)
+// ✅ Fix CORS: allow both local dev + deployed frontend
 app.use(cors({
-  origin: ["http://localhost:5173"],  // frontend dev server
+  origin: [
+    "http://localhost:5173",          // dev
+    "https://fintrexquiz.vercel.app"  // deployed frontend
+  ],
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true
 }));
 
-// Explicitly handle preflight
-app.options("*", cors({
-  origin: ["http://localhost:5173"],
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-  credentials: true
-}));
+// Explicit preflight handling
+app.options("*", cors());
 
 app.use(express.json());
 
 // ---- MongoDB ----
-mongoose.connect(process.env.MONGO_URI)
+mongoose.connect(process.env.MONGO_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
   .then(() => console.log("✅ MongoDB connected"))
-  .catch((err) => console.error("Mongo error:", err));
+  .catch((err) => console.error("❌ Mongo error:", err));
 
 // ---- Schema / Model ----
 const playerSchema = new mongoose.Schema(
@@ -134,4 +135,4 @@ app.get("/api/losers", async (_req, res) => {
 
 // ---- Start ----
 const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));
+app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
