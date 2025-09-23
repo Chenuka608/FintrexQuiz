@@ -144,7 +144,7 @@ const Questionnaire = ({ player, onLogout }) => {
   // Save result to backend once finished
   useEffect(() => {
     if (quizEnded && player) {
-      fetch("http://localhost:4000/api/result", {
+      fetch("https://fintrexquiz.onrender.com/api/result", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ nic: player.nic, score }),

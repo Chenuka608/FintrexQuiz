@@ -27,7 +27,8 @@ export default function Auth({ onSuccess }) {
     }
 
     try {
-      const res = await fetch("http://localhost:4000/api/auth/authenticate", {
+      // 👇 use Render backend instead of localhost
+      const res = await fetch("https://fintrexquiz.onrender.com/api/auth/authenticate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ nic: nicTrim, name: nameTrim, mobile: mobileTrim }),
