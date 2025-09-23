@@ -52,6 +52,11 @@ const isValidMobile = (mobile) => /^07[0-9]{8}$/.test(mobile);
 
 // ---- Routes ----
 
+// Health check (for uptime ping)
+app.get("/health", (req, res) => {
+  res.send("✅ OK - Fintrex Quiz backend is alive");
+});
+
 // Auth: login/register-on-first-use
 app.post("/api/auth/authenticate", async (req, res) => {
   try {
