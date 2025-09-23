@@ -11,13 +11,20 @@ const shuffleArray = (arr) => {
   return array;
 };
 
-const STORAGE_KEY = "fintrex_quiz_state";
 const QUIZ_DURATION_SECONDS = 360;
 
-const Questionnaire = () => {
+const Questionnaire = ({ player, onLogout }) => {
   const MySwal = withReactContent(Swal);
-  const restoredFromStorage = useRef(false);
   const timerRef = useRef(null);
+
+  // Block if no player (unauthorized attempt)
+  useEffect(() => {
+    if (!player) {
+      onLogout();
+    }
+  }, [player, onLogout]);
+
+  const STORAGE_KEY = `fintrex_quiz_${player?.nic}`;
 
   const [allQuestions, setAllQuestions] = useState([]);
   const [questions, setQuestions] = useState([]);
@@ -25,62 +32,12 @@ const Questionnaire = () => {
   const [score, setScore] = useState(0);
   const [showStart, setShowStart] = useState(true);
   const [loading, setLoading] = useState(true);
-  const [timeUpHandled, setTimeUpHandled] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(QUIZ_DURATION_SECONDS);
   const [quizEnded, setQuizEnded] = useState(false);
   const [quizStartTimestamp, setQuizStartTimestamp] = useState(null);
-  const [timeLeft, setTimeLeft] = useState(QUIZ_DURATION_SECONDS);
 
   const [selectedOption, setSelectedOption] = useState(null);
   const [answersGiven, setAnswersGiven] = useState([]);
-
-  // Restore state if it exists
-  useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        setQuestions(parsed.questions || []);
-        setCurrentIndex(parsed.currentIndex || 0);
-        setScore(parsed.score || 0);
-        setShowStart(parsed.showStart ?? true);
-        setTimeUpHandled(parsed.timeUpHandled ?? false);
-        setQuizEnded(parsed.quizEnded ?? false);
-        setQuizStartTimestamp(parsed.quizStartTimestamp || null);
-        setAnswersGiven(parsed.answersGiven || []);
-        setSelectedOption(parsed.selectedOption || null);
-        restoredFromStorage.current = true;
-      } catch {}
-    }
-  }, []);
-
-  // Save state to storage
-  useEffect(() => {
-    if (!loading) {
-      const stateToSave = {
-        questions,
-        currentIndex,
-        score,
-        showStart,
-        timeUpHandled,
-        quizEnded,
-        quizStartTimestamp,
-        answersGiven,
-        selectedOption,
-      };
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(stateToSave));
-    }
-  }, [
-    questions,
-    currentIndex,
-    score,
-    showStart,
-    timeUpHandled,
-    quizEnded,
-    quizStartTimestamp,
-    answersGiven,
-    selectedOption,
-    loading,
-  ]);
 
   // Load questions
   useEffect(() => {
@@ -89,9 +46,6 @@ const Questionnaire = () => {
       .then((data) => {
         setAllQuestions(data);
         setLoading(false);
-        if (!restoredFromStorage.current) {
-          setShowStart(true);
-        }
       })
       .catch(() => {
         MySwal.fire({
@@ -102,16 +56,67 @@ const Questionnaire = () => {
       });
   }, []);
 
+  // Restore state from localStorage if exists
+  useEffect(() => {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+
+        if (!parsed.quizEnded && parsed.questions?.length > 0) {
+          // Resume ongoing quiz
+          setQuestions(parsed.questions);
+          setCurrentIndex(parsed.currentIndex || 0);
+          setScore(parsed.score || 0);
+          setShowStart(false);
+          setQuizEnded(false);
+          setQuizStartTimestamp(parsed.quizStartTimestamp || Date.now());
+          setTimeLeft(parsed.timeLeft || QUIZ_DURATION_SECONDS);
+          setAnswersGiven(parsed.answersGiven || []);
+          setSelectedOption(parsed.selectedOption || null);
+        } else if (parsed.quizEnded) {
+          // Already ended → kick back
+          handleLogout();
+        }
+      } catch {
+        console.error("Failed to restore quiz state");
+      }
+    }
+  }, [STORAGE_KEY]);
+
+  // Save state to localStorage
+  useEffect(() => {
+    if (!quizEnded) {
+      const stateToSave = {
+        questions,
+        currentIndex,
+        score,
+        showStart,
+        quizEnded,
+        quizStartTimestamp,
+        timeLeft,
+        answersGiven,
+        selectedOption,
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(stateToSave));
+    }
+  }, [
+    questions,
+    currentIndex,
+    score,
+    showStart,
+    quizEnded,
+    quizStartTimestamp,
+    timeLeft,
+    answersGiven,
+    selectedOption,
+    STORAGE_KEY,
+  ]);
+
   // Timer
   useEffect(() => {
     if (showStart || quizEnded) return;
-
-    if (!quizStartTimestamp) {
-      const now = Date.now();
-      setQuizStartTimestamp(now);
-      setTimeLeft(QUIZ_DURATION_SECONDS);
-      return;
-    }
+    if (!quizStartTimestamp) return;
 
     const updateTimer = () => {
       const now = Date.now();
@@ -120,16 +125,12 @@ const Questionnaire = () => {
 
       if (remaining <= 0) {
         setTimeLeft(0);
-        if (!timeUpHandled) {
-          setTimeUpHandled(true);
-          timerRef.current && clearInterval(timerRef.current);
-          MySwal.fire({
-            icon: "warning",
-            title: "Time's up!",
-            text: "Your time has run out. Check your results.",
-            confirmButtonText: "See Score",
-          }).then(() => setQuizEnded(true));
-        }
+        clearInterval(timerRef.current);
+        MySwal.fire({
+          icon: "warning",
+          title: "Time's up!",
+          text: "Your time has run out.",
+        }).then(() => setQuizEnded(true));
       } else {
         setTimeLeft(remaining);
       }
@@ -137,19 +138,37 @@ const Questionnaire = () => {
 
     updateTimer();
     timerRef.current = setInterval(updateTimer, 1000);
-
     return () => clearInterval(timerRef.current);
-  }, [quizStartTimestamp, showStart, quizEnded, timeUpHandled]);
+  }, [quizStartTimestamp, showStart, quizEnded]);
 
+  // Save result to backend once finished
   useEffect(() => {
-    if (quizEnded) {
-      timerRef.current && clearInterval(timerRef.current);
+    if (quizEnded && player) {
+      fetch("http://localhost:4000/api/result", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ nic: player.nic, score }),
+      })
+        .then(() => {
+          // Wait a bit to show results page, then logout
+          setTimeout(() => handleLogout(), 6000);
+        })
+        .catch((err) => {
+          console.error("Save failed", err);
+          handleLogout();
+        });
     }
-  }, [quizEnded]);
+  }, [quizEnded, player, score]);
+
+  const handleLogout = () => {
+    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem("fintrex_player");
+    if (onLogout) onLogout();
+  };
 
   // Submit answer
   const submitAnswer = () => {
-    if (quizEnded || timeLeft <= 0 || selectedOption === null) return;
+    if (quizEnded || selectedOption === null) return;
 
     const currentQ = questions[currentIndex];
     const isCorrect = selectedOption === currentQ.answer;
@@ -161,16 +180,9 @@ const Questionnaire = () => {
 
     if (isCorrect) setScore((s) => s + 1);
 
-    const imgs = isCorrect
-      ? ["correct1.jpg", "correct2.jpg", "correct3.jpg"]
-      : ["wrong1.jpg", "wrong2.jpg", "wrong3.jpg"];
-
-    const idx = Math.floor(Math.random() * imgs.length);
-    const imgUrl = `/assets/${imgs[idx]}`;
-
     MySwal.fire({
       title: isCorrect ? "Correct!" : "Wrong!",
-      imageUrl: imgUrl,
+      imageUrl: isCorrect ? "/assets/correct1.jpg" : "/assets/wrong1.jpg",
       imageHeight: 300,
       confirmButtonText: "Continue",
     }).then(() => {
@@ -184,24 +196,7 @@ const Questionnaire = () => {
     });
   };
 
-  const resetToIntro = () => {
-    setShowStart(true);
-    setQuestions([]);
-    setCurrentIndex(0);
-    setScore(0);
-    setTimeUpHandled(false);
-    setQuizEnded(false);
-    setQuizStartTimestamp(null);
-    setTimeLeft(QUIZ_DURATION_SECONDS);
-    setSelectedOption(null);
-    setAnswersGiven([]);
-    localStorage.removeItem(STORAGE_KEY);
-    restoredFromStorage.current = false;
-  };
-
   const startQuiz = () => {
-    if (!allQuestions.length) return;
-
     const now = Date.now();
     const selected = shuffleArray(allQuestions).slice(0, 10);
     const shuffledQuestions = selected.map((q) => ({
@@ -213,16 +208,12 @@ const Questionnaire = () => {
     setQuestions(shuffledQuestions);
     setCurrentIndex(0);
     setScore(0);
-    setTimeUpHandled(false);
     setQuizEnded(false);
     setQuizStartTimestamp(now);
     setTimeLeft(QUIZ_DURATION_SECONDS);
     setSelectedOption(null);
     setAnswersGiven([]);
     setShowStart(false);
-
-    localStorage.removeItem(STORAGE_KEY);
-    restoredFromStorage.current = false;
   };
 
   const formatTime = (s) => {
@@ -231,7 +222,8 @@ const Questionnaire = () => {
     return `${m}:${sec < 10 ? "0" : ""}${sec}`;
   };
 
-  // Loading screen
+  // ---- UI ----
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-purple-800 text-white">
@@ -240,11 +232,11 @@ const Questionnaire = () => {
     );
   }
 
-  // End screen
+  // End screen (victory/loss)
   if (quizEnded) {
-    const passed = score >= 6;
-    const finalImg = passed ? "/assets/won.jpg" : "/assets/lost.jpg";
-    const finalTitle = passed ? "Congratulations!" : "Better luck next time!";
+    const isWinner = score === 10;
+    const finalImg = isWinner ? "/assets/won.jpg" : "/assets/lost.jpg";
+    const finalTitle = isWinner ? "🎉 Congratulations, You WON!" : "😢 Better luck next time!";
     const finalMsg = `You scored ${score} / ${questions.length}.`;
 
     return (
@@ -253,104 +245,65 @@ const Questionnaire = () => {
           <img src={finalImg} alt="Result" className="w-80 max-w-full mb-4 rounded-lg shadow-xl" />
           <h2 className="text-3xl mb-2">{finalTitle}</h2>
           <p className="text-2xl mb-10">{finalMsg}</p>
+          <p className="text-sm text-gray-300">You will be redirected shortly...</p>
         </div>
 
         <h2 className="text-2xl mb-4 text-center">Review Your Answers</h2>
         <div className="max-w-3xl mx-auto space-y-4">
           {answersGiven.map(({ question, selected, correct }, i) => {
-            const isCorrect = selected === correct;
+            const correctAns = selected === correct;
             return (
               <div
                 key={i}
                 className={`p-4 rounded-lg shadow-md ${
-                  isCorrect ? "bg-green-700" : "bg-red-700"
+                  correctAns ? "bg-green-700" : "bg-red-700"
                 }`}
               >
                 <h2 className="text-lg mb-1">{`Q${i + 1}: ${question}`}</h2>
-                <p>Your answer: <span className="font-semibold">{selected}</span></p>
-                {!isCorrect && <p>Correct answer: <span className="font-semibold">{correct}</span></p>}
+                <p>
+                  Your answer: <span className="font-semibold">{selected}</span>
+                </p>
+                {!correctAns && (
+                  <p>
+                    Correct answer: <span className="font-semibold">{correct}</span>
+                  </p>
+                )}
               </div>
             );
           })}
-        </div>
-
-        <div className="flex justify-center mt-10">
-          <button
-            onClick={resetToIntro}
-            className="bg-lime-400 hover:bg-lime-500 px-10 py-4 rounded-lg text-white text-2xl font-bold shadow-md"
-          >
-            Restart Quiz
-          </button>
         </div>
       </div>
     );
   }
 
-  // Menu (Start Screen)
-if (showStart) {
-  return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-purple-800 text-white text-center px-6">
-      {/* Logo */}
-      <img 
-        src="/assets/logo.png" 
-        alt="Fintrex Logo" 
-        className="w-32 sm:w-40 mb-6 drop-shadow-lg"
-      />
-
-      {/* Event Titles */}
-      <h1 className="text-4xl sm:text-5xl font-extrabold mb-2">Fintrex Finance</h1>
-      <h2 className="text-2xl sm:text-3xl font-semibold mb-8">
-        Customer Service Week
-      </h2>
-
-      {/* Intro Image */}
-      <img 
-        src="/assets/menu.jpg" 
-        alt="Intro" 
-        className="w-100 sm:w-100 mb-10 rounded-lg shadow-lg"
-      />
-
-      {/* Start Button */}
-      <button
-        onClick={startQuiz}
-        className="bg-lime-400 hover:bg-lime-500 px-10 py-4 rounded text-white text-2xl font-bold shadow-sm transition"
-      >
-        Start Quiz
-      </button>
-    </div>
-  );
-}
+  // Start screen
+  if (showStart) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-purple-800 text-white text-center px-6">
+        <img src="/assets/logo.png" alt="Fintrex Logo" className="w-32 sm:w-40 mb-6 drop-shadow-lg" />
+        <h1 className="text-4xl sm:text-5xl font-extrabold mb-2">Fintrex Finance</h1>
+        <h2 className="text-2xl sm:text-3xl font-semibold mb-8">Customer Service Week</h2>
+        <img src="/assets/menu.jpg" alt="Intro" className="w-100 sm:w-100 mb-10 rounded-lg shadow-lg" />
+        <button
+          onClick={startQuiz}
+          className="bg-lime-400 hover:bg-lime-500 px-10 py-4 rounded text-white text-2xl font-bold shadow-sm transition"
+        >
+          Start Quiz
+        </button>
+      </div>
+    );
+  }
 
   // Quiz screen
   const currentQ = questions[currentIndex];
 
   return (
     <div className="min-h-screen bg-purple-800 text-white flex flex-col items-center justify-center px-4 py-8 relative">
-      <button
-        onClick={() => {
-          MySwal.fire({
-            title: "Start a new game?",
-            text: "Your current progress will be lost. Are you sure?",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#d33",
-            cancelButtonColor: "#3085d6",
-            confirmButtonText: "Yes, start over",
-            cancelButtonText: "Cancel",
-          }).then((result) => {
-            if (result.isConfirmed) {
-              resetToIntro();
-            }
-          });
-        }}
-        className="absolute top-4 right-4 bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-white font-semibold shadow-md"
-      >
-        New Game
-      </button>
-
       <div className="w-full max-w-xl">
         <div className="flex flex-col sm:flex-row justify-between items-center mb-5 text-lg font-semibold">
-          <span>Question {currentIndex + 1} / {questions.length}</span>
+          <span>
+            Question {currentIndex + 1} / {questions.length}
+          </span>
           <span>Time Left: {formatTime(timeLeft)}</span>
         </div>
 
@@ -362,7 +315,7 @@ if (showStart) {
               return (
                 <button
                   key={i}
-                  onClick={() => !quizEnded && setSelectedOption(opt)}
+                  onClick={() => setSelectedOption(opt)}
                   className={`p-4 rounded-lg text-left w-full shadow-sm transition
                     ${isSelected ? "bg-lime-500" : "bg-lime-700 hover:bg-lime-500"}
                   `}
