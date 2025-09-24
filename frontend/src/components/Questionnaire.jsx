@@ -62,7 +62,11 @@ const Questionnaire = ({ player, onLogout }) => {
     const completed = localStorage.getItem(`${STORAGE_KEY}_completed`);
 
     if (completed) {
-      // Already completed → force end screen
+      // Load the saved final result
+      const result = JSON.parse(completed);
+      setScore(result.score || 0);
+      setAnswersGiven(result.answersGiven || []);
+      setQuestions(result.questions || []);
       setQuizEnded(true);
       setShowStart(false);
       return;
@@ -71,7 +75,6 @@ const Questionnaire = ({ player, onLogout }) => {
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-
         if (!parsed.quizEnded && parsed.questions?.length > 0) {
           setQuestions(parsed.questions);
           setCurrentIndex(parsed.currentIndex || 0);
@@ -105,9 +108,14 @@ const Questionnaire = ({ player, onLogout }) => {
       };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(stateToSave));
     } else {
-      // Once ended → clear progress & mark completed
+      // Once ended → clear progress & save results permanently
       localStorage.removeItem(STORAGE_KEY);
-      localStorage.setItem(`${STORAGE_KEY}_completed`, "true");
+      const resultData = {
+        score,
+        answersGiven,
+        questions,
+      };
+      localStorage.setItem(`${STORAGE_KEY}_completed`, JSON.stringify(resultData));
     }
   }, [
     questions,
