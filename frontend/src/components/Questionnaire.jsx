@@ -59,6 +59,15 @@ const Questionnaire = ({ player, onLogout }) => {
   // Restore state from localStorage if exists
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
+    const completed = localStorage.getItem(`${STORAGE_KEY}_completed`);
+
+    if (completed) {
+      // Already completed → force end screen
+      setQuizEnded(true);
+      setShowStart(false);
+      return;
+    }
+
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
@@ -73,8 +82,6 @@ const Questionnaire = ({ player, onLogout }) => {
           setTimeLeft(parsed.timeLeft || QUIZ_DURATION_SECONDS);
           setAnswersGiven(parsed.answersGiven || []);
           setSelectedOption(parsed.selectedOption || null);
-        } else if (parsed.quizEnded) {
-          handleLogout();
         }
       } catch {
         console.error("Failed to restore quiz state");
@@ -97,6 +104,10 @@ const Questionnaire = ({ player, onLogout }) => {
         selectedOption,
       };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(stateToSave));
+    } else {
+      // Once ended → clear progress & mark completed
+      localStorage.removeItem(STORAGE_KEY);
+      localStorage.setItem(`${STORAGE_KEY}_completed`, "true");
     }
   }, [
     questions,
@@ -226,7 +237,7 @@ const Questionnaire = ({ player, onLogout }) => {
 
   // End screen
   if (quizEnded) {
-    const isWinner = score >= 7; // ✅ Win if 7 or above
+    const isWinner = score >= 7;
     const finalImg = isWinner ? "/assets/won.jpg" : "/assets/lost.jpg";
     const finalTitle = isWinner ? "🎉 Congratulations, You WON!" : "😢 Better luck next time!";
     const finalMsg = `You scored ${score} / ${questions.length}.`;
