@@ -148,15 +148,9 @@ const Questionnaire = ({ player, onLogout }) => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ nic: player.nic, score }),
-      })
-        .then(() => {
-          // Wait a bit to show results page, then logout
-          setTimeout(() => handleLogout(), 6000);
-        })
-        .catch((err) => {
-          console.error("Save failed", err);
-          handleLogout();
-        });
+      }).catch((err) => {
+        console.error("Save failed", err);
+      });
     }
   }, [quizEnded, player, score]);
 
@@ -245,11 +239,10 @@ const Questionnaire = ({ player, onLogout }) => {
           <img src={finalImg} alt="Result" className="w-80 max-w-full mb-4 rounded-lg shadow-xl" />
           <h2 className="text-3xl mb-2">{finalTitle}</h2>
           <p className="text-2xl mb-10">{finalMsg}</p>
-          <p className="text-sm text-gray-300">You will be redirected shortly...</p>
         </div>
 
         <h2 className="text-2xl mb-4 text-center">Review Your Answers</h2>
-        <div className="max-w-3xl mx-auto space-y-4">
+        <div className="max-w-3xl mx-auto space-y-4 mb-8">
           {answersGiven.map(({ question, selected, correct }, i) => {
             const correctAns = selected === correct;
             return (
@@ -271,6 +264,21 @@ const Questionnaire = ({ player, onLogout }) => {
               </div>
             );
           })}
+        </div>
+
+        <div className="flex justify-center gap-4">
+          <button
+            onClick={startQuiz}
+            className="bg-lime-400 hover:bg-lime-500 px-6 py-3 rounded-lg text-white font-bold"
+          >
+            Play Again
+          </button>
+          <button
+            onClick={handleLogout}
+            className="bg-red-500 hover:bg-red-600 px-6 py-3 rounded-lg text-white font-bold"
+          >
+            Logout
+          </button>
         </div>
       </div>
     );
