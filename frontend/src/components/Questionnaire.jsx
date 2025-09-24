@@ -17,7 +17,6 @@ const Questionnaire = ({ player, onLogout }) => {
   const MySwal = withReactContent(Swal);
   const timerRef = useRef(null);
 
-  // Block if no player (unauthorized attempt)
   useEffect(() => {
     if (!player) {
       onLogout();
@@ -35,7 +34,6 @@ const Questionnaire = ({ player, onLogout }) => {
   const [timeLeft, setTimeLeft] = useState(QUIZ_DURATION_SECONDS);
   const [quizEnded, setQuizEnded] = useState(false);
   const [quizStartTimestamp, setQuizStartTimestamp] = useState(null);
-
   const [selectedOption, setSelectedOption] = useState(null);
   const [answersGiven, setAnswersGiven] = useState([]);
 
@@ -56,26 +54,22 @@ const Questionnaire = ({ player, onLogout }) => {
       });
   }, []);
 
-  // Restore state from localStorage if exists
+  // Restore state
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
-    const completed = localStorage.getItem(`${STORAGE_KEY}_completed`);
-
-    if (completed) {
-      // Load the saved final result
-      const result = JSON.parse(completed);
-      setScore(result.score || 0);
-      setAnswersGiven(result.answersGiven || []);
-      setQuestions(result.questions || []);
-      setQuizEnded(true);
-      setShowStart(false);
-      return;
-    }
-
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        if (!parsed.quizEnded && parsed.questions?.length > 0) {
+
+        if (parsed.quizEnded) {
+          // 🔒 Lock in final result — don’t reset anything
+          setQuestions(parsed.questions || []);
+          setScore(parsed.score || 0);
+          setAnswersGiven(parsed.answersGiven || []);
+          setQuizEnded(true);
+          setShowStart(false);
+        } else if (parsed.questions?.length > 0) {
+          // mid-quiz restore
           setQuestions(parsed.questions);
           setCurrentIndex(parsed.currentIndex || 0);
           setScore(parsed.score || 0);
@@ -92,31 +86,20 @@ const Questionnaire = ({ player, onLogout }) => {
     }
   }, [STORAGE_KEY]);
 
-  // Save state to localStorage
+  // Persist state
   useEffect(() => {
-    if (!quizEnded) {
-      const stateToSave = {
-        questions,
-        currentIndex,
-        score,
-        showStart,
-        quizEnded,
-        quizStartTimestamp,
-        timeLeft,
-        answersGiven,
-        selectedOption,
-      };
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(stateToSave));
-    } else {
-      // Once ended → clear progress & save results permanently
-      localStorage.removeItem(STORAGE_KEY);
-      const resultData = {
-        score,
-        answersGiven,
-        questions,
-      };
-      localStorage.setItem(`${STORAGE_KEY}_completed`, JSON.stringify(resultData));
-    }
+    const stateToSave = {
+      questions,
+      currentIndex,
+      score,
+      showStart,
+      quizEnded,
+      quizStartTimestamp,
+      timeLeft,
+      answersGiven,
+      selectedOption,
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(stateToSave));
   }, [
     questions,
     currentIndex,
@@ -143,11 +126,12 @@ const Questionnaire = ({ player, onLogout }) => {
       if (remaining <= 0) {
         setTimeLeft(0);
         clearInterval(timerRef.current);
+        setQuizEnded(true);
         MySwal.fire({
           icon: "warning",
           title: "Time's up!",
           text: "Your time has run out.",
-        }).then(() => setQuizEnded(true));
+        });
       } else {
         setTimeLeft(remaining);
       }
@@ -158,7 +142,7 @@ const Questionnaire = ({ player, onLogout }) => {
     return () => clearInterval(timerRef.current);
   }, [quizStartTimestamp, showStart, quizEnded]);
 
-  // Save result to backend once finished
+  // Save result
   useEffect(() => {
     if (quizEnded && player) {
       fetch("https://fintrexquiz.onrender.com/api/result", {
@@ -177,7 +161,6 @@ const Questionnaire = ({ player, onLogout }) => {
     if (onLogout) onLogout();
   };
 
-  // Submit answer
   const submitAnswer = () => {
     if (quizEnded || selectedOption === null) return;
 
@@ -199,7 +182,7 @@ const Questionnaire = ({ player, onLogout }) => {
     }).then(() => {
       const nextIndex = currentIndex + 1;
       if (nextIndex >= questions.length) {
-        setQuizEnded(true);
+        setQuizEnded(true); // 🔒 lock
       } else {
         setCurrentIndex(nextIndex);
         setSelectedOption(null);
@@ -233,8 +216,6 @@ const Questionnaire = ({ player, onLogout }) => {
     return `${m}:${sec < 10 ? "0" : ""}${sec}`;
   };
 
-  // ---- UI ----
-
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-purple-800 text-white">
@@ -243,7 +224,6 @@ const Questionnaire = ({ player, onLogout }) => {
     );
   }
 
-  // End screen
   if (quizEnded) {
     const isWinner = score >= 7;
     const finalImg = isWinner ? "/assets/won.jpg" : "/assets/lost.jpg";
@@ -295,7 +275,6 @@ const Questionnaire = ({ player, onLogout }) => {
     );
   }
 
-  // Start screen
   if (showStart) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-purple-800 text-white text-center px-6">
@@ -313,7 +292,6 @@ const Questionnaire = ({ player, onLogout }) => {
     );
   }
 
-  // Quiz screen
   const currentQ = questions[currentIndex];
 
   return (
