@@ -64,7 +64,6 @@ const Questionnaire = ({ player, onLogout }) => {
         const parsed = JSON.parse(saved);
 
         if (!parsed.quizEnded && parsed.questions?.length > 0) {
-          // Resume ongoing quiz
           setQuestions(parsed.questions);
           setCurrentIndex(parsed.currentIndex || 0);
           setScore(parsed.score || 0);
@@ -75,7 +74,6 @@ const Questionnaire = ({ player, onLogout }) => {
           setAnswersGiven(parsed.answersGiven || []);
           setSelectedOption(parsed.selectedOption || null);
         } else if (parsed.quizEnded) {
-          // Already ended → kick back
           handleLogout();
         }
       } catch {
@@ -226,9 +224,9 @@ const Questionnaire = ({ player, onLogout }) => {
     );
   }
 
-  // End screen (victory/loss)
+  // End screen
   if (quizEnded) {
-    const isWinner = score === 10;
+    const isWinner = score >= 7; // ✅ Win if 7 or above
     const finalImg = isWinner ? "/assets/won.jpg" : "/assets/lost.jpg";
     const finalTitle = isWinner ? "🎉 Congratulations, You WON!" : "😢 Better luck next time!";
     const finalMsg = `You scored ${score} / ${questions.length}.`;
@@ -266,13 +264,7 @@ const Questionnaire = ({ player, onLogout }) => {
           })}
         </div>
 
-        <div className="flex justify-center gap-4">
-          <button
-            onClick={startQuiz}
-            className="bg-lime-400 hover:bg-lime-500 px-6 py-3 rounded-lg text-white font-bold"
-          >
-            Play Again
-          </button>
+        <div className="flex justify-center">
           <button
             onClick={handleLogout}
             className="bg-red-500 hover:bg-red-600 px-6 py-3 rounded-lg text-white font-bold"
