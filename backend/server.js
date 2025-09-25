@@ -9,15 +9,17 @@ dotenv.config();
 const app = express();
 
 // ✅ Fix CORS: allow both local dev + deployed frontend
-app.use(cors({
-  origin: [
-    "http://localhost:5173",          // dev
-    "https://fintrexquiz.vercel.app"  // deployed frontend
-  ],
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-  credentials: true
-}));
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173", // dev
+      "https://fintrexquiz.vercel.app", // deployed frontend
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+  })
+);
 
 // Explicit preflight handling
 app.options("*", cors());
@@ -25,10 +27,11 @@ app.options("*", cors());
 app.use(express.json());
 
 // ---- MongoDB ----
-mongoose.connect(process.env.MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
+mongoose
+  .connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
   .then(() => console.log("✅ MongoDB connected"))
   .catch((err) => console.error("❌ Mongo error:", err));
 
@@ -54,8 +57,8 @@ const isValidMobile = (mobile) => /^07[0-9]{8}$/.test(mobile);
 // ---- Routes ----
 
 // Health check (for uptime ping)
-app.get("/health", (req, res) => {
-  res.send("✅ OK - Fintrex Quiz backend is alive");
+app.get("/health", (_req, res) => {
+  res.json({ status: "ok" });
 });
 
 // Auth: login/register-on-first-use
@@ -63,14 +66,18 @@ app.post("/api/auth/authenticate", async (req, res) => {
   try {
     const { nic, name = "", mobile } = req.body;
 
-    if (!isValidNIC(nic)) return res.status(400).json({ message: "Invalid NIC format" });
-    if (!isValidMobile(mobile)) return res.status(400).json({ message: "Invalid Mobile Number" });
+    if (!isValidNIC(nic))
+      return res.status(400).json({ message: "Invalid NIC format" });
+    if (!isValidMobile(mobile))
+      return res.status(400).json({ message: "Invalid Mobile Number" });
 
     let player = await Player.findOne({ $or: [{ nic }, { mobile }] });
 
     if (player) {
       if (player.nic !== nic || player.mobile !== mobile) {
-        return res.status(409).json({ message: "NIC or Mobile already registered to a different user" });
+        return res
+          .status(409)
+          .json({ message: "NIC or Mobile already registered to a different user" });
       }
       if (player.played) {
         return res.status(403).json({ message: "Already played!" });
@@ -99,16 +106,19 @@ app.post("/api/result", async (req, res) => {
   try {
     const { nic, score } = req.body;
 
-    if (!isValidNIC(nic)) return res.status(400).json({ message: "Invalid NIC format" });
+    if (!isValidNIC(nic))
+      return res.status(400).json({ message: "Invalid NIC format" });
     if (typeof score !== "number" || score < 0 || score > 10) {
       return res.status(400).json({ message: "Invalid score" });
     }
 
-    const status = score === 10 ? "WON" : "LOST";
+    // ✅ Match frontend rule: WIN if score >= 7
+    const status = score >= 7 ? "WON" : "LOST";
     const player = await Player.findOne({ nic });
 
     if (!player) return res.status(404).json({ message: "Player not found" });
-    if (player.played) return res.status(403).json({ message: "Result already recorded" });
+    if (player.played)
+      return res.status(403).json({ message: "Result already recorded" });
 
     player.score = score;
     player.status = status;
@@ -135,4 +145,6 @@ app.get("/api/losers", async (_req, res) => {
 
 // ---- Start ----
 const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+app.listen(PORT, () =>
+  console.log(`🚀 Server running on port ${PORT}`)
+);
